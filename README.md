@@ -3,4 +3,5 @@
 
 
 ってことでフクキタルが占いの結果をDiscordに流してくれるbotです
+
 占いの内容は(https://twitter.com/uranai_futagoza )から取ってます

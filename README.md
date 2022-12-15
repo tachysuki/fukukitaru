@@ -4,4 +4,28 @@
 
 ってことでフクキタルが占いの結果をDiscordに流してくれるbotです
 
-占いの内容は(https://twitter.com/uranai_futagoza )から取ってます
+占いの内容は
+
+みずがめ座: https://twitter.com/uranai_mizugaam
+
+うお座: https://twitter.com/uranai_uozaa
+
+おうし座: https://twitter.com/uranai_oushiza
+
+ふたご座: https://twitter.com/uranai_futagoza
+
+かに座: https://twitter.com/uranai_kanizaa
+
+しし座: https://twitter.com/uranai_shishiza
+
+おとめ座: https://twitter.com/uranai_otomez
+
+てんびん座: https://twitter.com/uranai_tenbinza
+
+さそり座: https://twitter.com/uranai_sasoriza
+
+いて座: https://twitter.com/uranai_itezaa
+
+やぎ座: https://twitter.com/uranai_yagizaa
+
+から取ってます

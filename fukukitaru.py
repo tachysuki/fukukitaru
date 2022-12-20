@@ -4,6 +4,7 @@ import tweepy
 import time
 import traceback
 import datetime
+import random
 
 # Discord
 TOKEN = 'hogehoge12345678'
@@ -21,6 +22,7 @@ global isfirstloop
 isfirstloop = True
 global screen_id
 screen_id = None
+chanting = ['エコエコアザラシ...エコエコオットセイ...。運勢よ〜〜〜〜カムトゥミー！','ふんにゃか〜...はんにゃか〜...。今日の運勢を示したまえーっ！']
 
 
 
@@ -82,7 +84,7 @@ async def on_message(message):
     try:
         global isfirstloop
         global screen_id
-       
+        global chanting
         # メッセージ送信者がBotだった場合は無視する
         get_datas = ''
         oldtext = ''
@@ -121,7 +123,7 @@ async def on_message(message):
                         if i == 12:
                             await message.channel.send("トレーナーさん！ちゃんと入れてください！")
                             break
-                        elif str(wait_message.content) == user_list[i][1]:
+                        elif user_list[i][1] in str(wait_message.content):
                             print(user_list[i][1])
                             #print(str(wait_message.content))
                             screen_id = i
@@ -135,6 +137,9 @@ async def on_message(message):
                 if oldtext == None:
                     while oldtext == None:
                         oldtext = get_user_timeline(screen_id)[0]
+                
+                await message.channel.send(random.choice(chanting))
+                time.sleep(3)
                 await message.channel.send(get_datas[0])
                 latestid = get_datas[1]
 
@@ -153,6 +158,8 @@ async def on_message(message):
                                         oldtext = get_datas[0]
 
                                         if get_datas[0] != None:
+                                            await message.channel.send(random.choice(chanting))
+                                            time.sleep(3)
                                             await message.channel.send(get_datas[0])
                                             latestid = get_datas[1]
                                             if latestid == None:
@@ -177,6 +184,8 @@ async def on_message(message):
                                     oldtext = get_datas[0]
 
                                     if get_datas[0] != None:
+                                        await message.channel.send(random.choice(chanting))
+                                        time.sleep(3)
                                         await message.channel.send(get_datas[0])
                                         latestid = get_datas[1]
                                         if latestid == None:

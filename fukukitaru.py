@@ -15,6 +15,7 @@ API_SECRET_KEY = "hogehoge12345678"
 ACCESS_TOKEN = "12345678-hogehoge"
 ACCESS_TOKEN_SECRET = "hogehoge12345678"
 
+
 # 接続に必要なオブジェクトを生成
 client = discord.Client()
 tweetid = 1601230194718621699
@@ -23,6 +24,7 @@ isfirstloop = True
 global screen_id
 screen_id = None
 chanting = ['エコエコアザラシ...エコエコオットセイ...。運勢よ〜〜〜〜カムトゥミー！','ふんにゃか〜...はんにゃか〜...。今日の運勢を示したまえーっ！']
+
 
 
 
@@ -39,16 +41,12 @@ user_list = [['mizugaam','みずがめ座',1601230194098212864],
             ['itezaa','いて座',1601230194613751809],
             ['yagizaa','やぎ座',1601230195075166210]]
 
-def get_user_timeline(screen_id):
-    api = twitter_api()
-    #tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0] , since_id=latestid).items()
-    tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=user_list[screen_id][2]).items()
-    #tweets = tweepy.Cursor(api.search_tweets, q='from:uma_musu since:%Y-%m-%d').items()
-    #while tweets == None:
+def get_user_timeline(screen_id, latestid):
+    api = twitter_api()  
+    tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=latestid).items()
+
     while tweets == None:
-        #tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=latestid).items()
-        tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=user_list[screen_id][2]).items()
-        #tweets = tweepy.Cursor(api.search_tweets, q='from:uma_musu since:%Y-%m-%d').items()
+        tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=latestid).items()
 
     for tweet in tweets:
         return [tweet.text, tweet.id]
@@ -65,18 +63,16 @@ def twitter_api() -> tweepy.API:
 
 
 
-#get_user_timeline()
+
 # 起動時に動作する処理
 @client.event
 async def on_ready():
     # 起動したらターミナルにログイン通知が表示される
     print('ログインしました')
     print('Ready to sent message')
-    #message.channel.send('Ready to send tweets. Please input start')
-
+    
 # メッセージ受信時に動作する処理
-#get_datas = get_user_timeline(tweetid)
-#print(get_datas[0])
+
 
 
 @client.event
@@ -93,15 +89,13 @@ async def on_message(message):
 
 
         if isfirstloop:
-        #await message.channel.send(get_datas[0])
+       
             print('message:' + str(message.content))
-            #if message.content in key_message or message.content == "救いはないのですか...?":
-            if "フクキタル" in message.content and "シラオキ様の御加護" in message.content or "救いはないのですか...?" in message.content:
-            #if message.content.startswith("救いはないのですか...?"):
-            #if message.content == "救いはないのですか...?":
+            
+            if "フクキタル" in message.content and "シラオキ様の御加護" in message.content or "救いはないのですか...?" in message.content or "フクちゃん先輩" in message.content and "シラオキ様の御加護" in message.content:
+            
                 print('message:' + str(message.content))
-                #oldesttext = get_user_timeline(2)[1]
-                #oldtext = get_user_timeline(1)
+               
                 def check(msg):
                     return msg.author == message.author
 
@@ -131,12 +125,12 @@ async def on_message(message):
                             await message.channel.send(user_list[screen_id][1] + "の運勢ですね！わかりました！")
                             break
                 
-                print(str(get_user_timeline(screen_id)))
-                get_datas = [get_user_timeline(screen_id)[0],get_user_timeline(screen_id)[1]]
-                #latestid = get_user_timeline(latestid)[1]
+                print(str(get_user_timeline(screen_id,user_list[screen_id][2])))
+                get_datas = [get_user_timeline(screen_id,user_list[screen_id][2])[0],get_user_timeline(screen_id,user_list[screen_id][2])[1]]
+        
                 if oldtext == None:
                     while oldtext == None:
-                        oldtext = get_user_timeline(screen_id)[0]
+                        oldtext = get_user_timeline(screen_id,user_list[screen_id][2])[0]
                 
                 await message.channel.send(random.choice(chanting))
                 time.sleep(3)
@@ -148,7 +142,7 @@ async def on_message(message):
                         dt_now = datetime.datetime.now()
                         if dt_now.strftime('%H:%M:%S') == '00:00:00':
                             while dt_now.minute < 10:
-                                get_datas = get_user_timeline(screen_id)
+                                get_datas = get_user_timeline(screen_id,latestid)
                                 print(get_datas)
 
                                 try:
@@ -165,6 +159,8 @@ async def on_message(message):
                                             if latestid == None:
                                                 while latestid == None:
                                                     latestid = get_datas[1]
+
+                                            break
                                 except:
                                     pass
                                 
@@ -176,7 +172,7 @@ async def on_message(message):
                         time.sleep(60)
 
                     except discord.errors.HTTPException:
-                        get_datas[0] = get_user_timeline(screen_id)[0]
+                        get_datas[0] = get_user_timeline(screen_id,latestid)[0]
 
                         if get_datas[0] != oldtext and get_datas[0] != None:
                                     print('get_datas[0]: ' + str(get_datas[0]))

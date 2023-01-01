@@ -29,3 +29,7 @@
 やぎ座: https://twitter.com/uranai_yagizaa
 
 から取ってます
+
+開発中の現象が絵になりました
+
+https://twitter.com/sd_nagi/status/1602549588308951040?s=61&t=ZDDLwnpph59HI6w8wTh-dQ

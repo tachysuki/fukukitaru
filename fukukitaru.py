@@ -1,10 +1,10 @@
 # インストールした discord.py を読み込む
 import discord
 import tweepy
-import time
 import traceback
 import datetime
 import random
+import asyncio
 
 # Discord
 TOKEN = 'hogehoge12345678'
@@ -14,6 +14,9 @@ API_KEY = "hogehoge12345678"
 API_SECRET_KEY = "hogehoge12345678"
 ACCESS_TOKEN = "12345678-hogehoge"
 ACCESS_TOKEN_SECRET = "hogehoge12345678"
+
+
+
 
 
 # 接続に必要なオブジェクトを生成
@@ -133,7 +136,7 @@ async def on_message(message):
                         oldtext = get_user_timeline(screen_id,user_list[screen_id][2])[0]
                 
                 await message.channel.send(random.choice(chanting))
-                time.sleep(3)
+                await asyncio.sleep(3)
                 await message.channel.send(get_datas[0])
                 latestid = get_datas[1]
 
@@ -153,7 +156,7 @@ async def on_message(message):
 
                                         if get_datas[0] != None:
                                             await message.channel.send(random.choice(chanting))
-                                            time.sleep(3)
+                                            await asyncio.sleep(3)
                                             await message.channel.send(get_datas[0])
                                             latestid = get_datas[1]
                                             if latestid == None:
@@ -164,12 +167,12 @@ async def on_message(message):
                                 except:
                                     pass
                                 
-                                time.sleep(60)
+                                await asyncio.sleep(60)
 
 
                     except tweepy.errors.TooManyRequests:
                         await message.channel.send("むっ...! 水晶玉に汚れが!")
-                        time.sleep(60)
+                        await asyncio.sleep(60)
 
                     except discord.errors.HTTPException:
                         get_datas[0] = get_user_timeline(screen_id,latestid)[0]
@@ -181,7 +184,7 @@ async def on_message(message):
 
                                     if get_datas[0] != None:
                                         await message.channel.send(random.choice(chanting))
-                                        time.sleep(3)
+                                        await asyncio.sleep(3)
                                         await message.channel.send(get_datas[0])
                                         latestid = get_datas[1]
                                         if latestid == None:
@@ -191,7 +194,7 @@ async def on_message(message):
 
                     except tweepy.errors.TwitterServerError:
                         print('Stop by ServerError')
-                        time.sleep(60)
+                        await asyncio.sleep(60)
 
                     except tweepy.errors.TweepyException:
                         pass
@@ -202,7 +205,7 @@ async def on_message(message):
                         break
 
 
-                    time.sleep(1)
+                    await asyncio.sleep(1)
     except:
             await message.channel.send("ふんぎゃろおおー！")
             await message.channel.send(traceback.format_exc())

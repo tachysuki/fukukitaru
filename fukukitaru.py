@@ -5,27 +5,23 @@ import traceback
 import datetime
 import random
 import asyncio
+import os
 
 # Discord
 TOKEN = 'hogehoge12345678'
 
-#Twitter
-API_KEY = "hogehoge12345678"
-API_SECRET_KEY = "hogehoge12345678"
-ACCESS_TOKEN = "12345678-hogehoge"
-ACCESS_TOKEN_SECRET = "hogehoge12345678"
 
 
 
 
 
 # 接続に必要なオブジェクトを生成
-client = discord.Client()
+client = discord.Client(intents=discord.Intents.all())
 tweetid = 1601230194718621699
-global isfirstloop
 isfirstloop = True
-global screen_id
+isNeedConnect = True
 screen_id = None
+pid = None
 chanting = ['エコエコアザラシ...エコエコオットセイ...。運勢よ〜〜〜〜カムトゥミー！','ふんにゃか〜...はんにゃか〜...。今日の運勢を示したまえーっ！']
 
 
@@ -44,21 +40,17 @@ user_list = [['mizugaam','みずがめ座',1601230194098212864],
             ['itezaa','いて座',1601230194613751809],
             ['yagizaa','やぎ座',1601230195075166210]]
 
-def get_user_timeline(screen_id, latestid):
-    api = twitter_api()  
-    tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=latestid).items()
+import login
+
+def get_user_timeline(screen_id, latestid): 
+    tweets = tweepy.Cursor(login.api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=latestid).items()
 
     while tweets == None:
-        tweets = tweepy.Cursor(api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=latestid).items()
+        tweets = tweepy.Cursor(login.api.user_timeline, screen_name='uranai_' + user_list[screen_id][0], since_id=latestid).items()
 
     for tweet in tweets:
         return [tweet.text, tweet.id]
 
-
-def twitter_api() -> tweepy.API:
-    auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
-    auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-    return tweepy.API(auth)
 
 
 
@@ -81,23 +73,71 @@ async def on_ready():
 @client.event
 async def on_message(message):
     try:
+        await on_ready()
+        await main(message)
+
+    except aiohttp.client_exceptions.ClientOSError:
+        pass
+    except ssl.SSLError:
+        pass
+    except:
+        print('Error:' + traceback.format_exc())
+        await message.channel.send("ふんぎゃろおおー！")
+        await message.channel.send(traceback.format_exc())
+        
+
+
+
+                   
+#@client.event
+async def sendmessage(get_datas, oldtext, message, chanting):
+    try:
+        if get_datas[0] != oldtext and get_datas[0] != None:
+            print('get_datas[0]: ' + str(get_datas[0]))
+            print('oldtext: ' + str(oldtext))
+            oldtext = get_datas[0]
+
+            if get_datas[0] != None:
+                await message.channel.send(random.choice(chanting))
+                await asyncio.sleep(3)
+                await message.channel.send(get_datas[0])
+                latestid = get_datas[1]
+                if latestid == None:
+                    while latestid == None:
+                        latestid = get_datas[1]
+    
+    except aiohttp.client_exceptions.ClientOSError:
+        pass
+    except ssl.SSLError:
+        pass
+    except:
+        print('Error:' + traceback.format_exc())
+        await message.channel.send("ふんぎゃろおおー！")
+        await message.channel.send(traceback.format_exc())
+            
+
+#@client.event
+async def main(message):
+    try:
         global isfirstloop
         global screen_id
         global chanting
+        global pid
         # メッセージ送信者がBotだった場合は無視する
         get_datas = ''
         oldtext = ''
         #screen_id = None
         print('Running...')
+        print('message:' + str(message.content))
+        print(isfirstloop , screen_id)
+        print(pid)
 
 
-        if isfirstloop:
+        if isfirstloop == True:
        
-            print('message:' + str(message.content))
-            
-            if "フクキタル" in message.content and "シラオキ様の御加護" in message.content or "救いはないのですか...?" in message.content or "フクちゃん先輩" in message.content and "シラオキ様の御加護" in message.content:
-            
-                print('message:' + str(message.content))
+ 
+            if 'テスト' in message.content:
+
                
                 def check(msg):
                     return msg.author == message.author
@@ -122,7 +162,7 @@ async def on_message(message):
                             break
                         elif user_list[i][1] in str(wait_message.content):
                             print(user_list[i][1])
-                            #print(str(wait_message.content))
+
                             screen_id = i
                             print('screen_id:' + str(screen_id))
                             await message.channel.send(user_list[screen_id][1] + "の運勢ですね！わかりました！")
@@ -135,81 +175,97 @@ async def on_message(message):
                     while oldtext == None:
                         oldtext = get_user_timeline(screen_id,user_list[screen_id][2])[0]
                 
-                await message.channel.send(random.choice(chanting))
-                await asyncio.sleep(3)
-                await message.channel.send(get_datas[0])
+                await sendmessage(get_datas, oldtext, message, chanting)
                 latestid = get_datas[1]
 
-                while True:
+                if pid == None:
+                    pid = os.fork()
+                    print('pid:' + str(pid))
+
+                if pid != 0 and pid != None:
                     try:
-                        dt_now = datetime.datetime.now()
-                        if dt_now.strftime('%H:%M:%S') == '00:00:00':
-                            while dt_now.minute < 10:
-                                get_datas = get_user_timeline(screen_id,latestid)
-                                print(get_datas)
+                        while True:
 
-                                try:
-                                    if get_datas[0] != oldtext and get_datas[0] != None:
-                                        print('get_datas[0]: ' + str(get_datas[0]))
-                                        print('oldtext: ' + str(oldtext))
-                                        oldtext = get_datas[0]
+                            print('forked')
+                            print(isfirstloop,screen_id)
+                            try:
+                                dt_now = datetime.datetime.now()
+                                if dt_now.strftime('%H:%M:%S') == '00:00:00':
+                                    while dt_now.minute < 10:
+                                        get_datas = get_user_timeline(screen_id,latestid)
+                                        print(get_datas)
 
-                                        if get_datas[0] != None:
-                                            await message.channel.send(random.choice(chanting))
-                                            await asyncio.sleep(3)
-                                            await message.channel.send(get_datas[0])
-                                            latestid = get_datas[1]
-                                            if latestid == None:
-                                                while latestid == None:
+                                        try:
+                                            if get_datas[0] != oldtext and get_datas[0] != None:
+                                                print('get_datas[0]: ' + str(get_datas[0]))
+                                                print('oldtext: ' + str(oldtext))
+                                                oldtext = get_datas[0]
+
+                                                if get_datas[0] != None:
+                                                    await message.channel.send(random.choice(chanting))
+                                                    await asyncio.sleep(3)
+                                                    await message.channel.send(get_datas[0])
                                                     latestid = get_datas[1]
+                                                    if latestid == None:
+                                                        while latestid == None:
+                                                            latestid = get_datas[1]
 
-                                            break
-                                except:
-                                    pass
+                                                    break
+                                        except:
+                                            pass
+                                        
+                                        await asyncio.sleep(60)
                                 
+                                await asyncio.sleep(1)
+
+                            except tweepy.errors.TooManyRequests:
+                                await message.channel.send("むっ...! 水晶玉に汚れが!")
                                 await asyncio.sleep(60)
 
+                            except discord.errors.HTTPException:
+                                get_datas[0] = get_user_timeline(screen_id,latestid)[0]
 
-                    except tweepy.errors.TooManyRequests:
-                        await message.channel.send("むっ...! 水晶玉に汚れが!")
-                        await asyncio.sleep(60)
+                                sendmessage(get_datas, oldtext, message, chanting)
 
-                    except discord.errors.HTTPException:
-                        get_datas[0] = get_user_timeline(screen_id,latestid)[0]
+                            except tweepy.errors.TwitterServerError:
+                                print('Stop by ServerError')
+                                await asyncio.sleep(60)
 
-                        if get_datas[0] != oldtext and get_datas[0] != None:
-                                    print('get_datas[0]: ' + str(get_datas[0]))
-                                    print('oldtext: ' + str(oldtext))
-                                    oldtext = get_datas[0]
+                            except tweepy.errors.TweepyException:
+                                pass
 
-                                    if get_datas[0] != None:
-                                        await message.channel.send(random.choice(chanting))
-                                        await asyncio.sleep(3)
-                                        await message.channel.send(get_datas[0])
-                                        latestid = get_datas[1]
-                                        if latestid == None:
-                                            while latestid == None:
-                                                latestid = get_datas[1]
+                            except:
+                                print('Error:' + traceback.format_exc())
+                                await message.channel.send("ふんぎゃろおおー！")
+                                await message.channel.send(traceback.format_exc())
+                                break
 
+                    except aiohttp.client_exceptions.ClientOSError:
+                        pass
 
-                    except tweepy.errors.TwitterServerError:
-                        print('Stop by ServerError')
-                        await asyncio.sleep(60)
-
-                    except tweepy.errors.TweepyException:
+                    except ssl.SSLError:
                         pass
 
                     except:
+                        print('Error:' + traceback.format_exc())
                         await message.channel.send("ふんぎゃろおおー！")
                         await message.channel.send(traceback.format_exc())
-                        break
 
 
-                    await asyncio.sleep(1)
+
+
+                else:
+
+                    import fukukitaru_once
+
+    except aiohttp.client_exceptions.ClientOSError:
+        pass
+    except ssl.SSLError:
+        pass
     except:
-            await message.channel.send("ふんぎゃろおおー！")
-            await message.channel.send(traceback.format_exc())
-            pass
+        print('Error:' + traceback.format_exc())
+        await message.channel.send("ふんぎゃろおおー！")
+        await message.channel.send(traceback.format_exc())
 
-# Botの起動とDiscordサーバーへの接続
+
 client.run(TOKEN)

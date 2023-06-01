@@ -192,6 +192,7 @@ async def main(message):
                                 dt_now = datetime.datetime.now()
                                 if dt_now.strftime('%H:%M:%S') == '00:00:00':
                                     while dt_now.minute < 10:
+                                        dt_now = datetime.datetime.now()
                                         get_datas = get_user_timeline(screen_id,latestid)
                                         print(get_datas)
 

@@ -136,7 +136,7 @@ async def main(message):
         if isfirstloop == True:
        
  
-            if 'テスト' in message.content:
+            if "フクキタル" in message.content and "シラオキ様の御加護" in message.content or "救いはないのですか...?" in message.content or "フクちゃん先輩" in message.content and "シラオキ様の御加護" in message.content:
 
                
                 def check(msg):
